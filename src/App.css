@@ -1,0 +1,369 @@
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Link,
+  useNavigate,
+  Navigate,
+} from "react-router-dom";
+
+import "./index.css";
+
+// ================= LOGIN =================
+
+function Login() {
+  const navigate = useNavigate();
+
+  function handleLogin() {
+    localStorage.setItem("loggedIn", "true");
+    navigate("/settings");
+  }
+
+  return (
+    <div className="login-page">
+      <div className="login-box">
+
+        <h1>Login</h1>
+
+        <input
+          type="email"
+          placeholder="Enter Email"
+        />
+
+        <input
+          type="password"
+          placeholder="Enter Password"
+        />
+
+        <button onClick={handleLogin}>
+          Login
+        </button>
+
+      </div>
+    </div>
+  );
+}
+
+// ================= NAVBAR =================
+
+function Navbar() {
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    localStorage.removeItem("loggedIn");
+    navigate("/");
+  }
+
+  return (
+    <nav className="navbar">
+
+      <h2>User Account</h2>
+
+      <button onClick={handleLogout}>
+        Logout
+      </button>
+
+    </nav>
+  );
+}
+
+// ================= TABS =================
+
+function Tabs() {
+  return (
+    <div className="tabs">
+
+      <Link to="/settings/profile">
+        Profile
+      </Link>
+
+      <Link to="/settings/security">
+        Security
+      </Link>
+
+      <Link to="/settings/preferences">
+        Preferences
+      </Link>
+
+    </div>
+  );
+}
+
+// ================= SETTINGS =================
+
+function Settings() {
+  return (
+    <div className="page">
+
+      <Navbar />
+
+      <div className="settings-box">
+
+        <h1>Account Settings</h1>
+
+        <p className="subtitle">
+          Manage your account and preferences
+        </p>
+
+        <Tabs />
+
+        <div className="content">
+
+          <h2>Welcome to Account Settings</h2>
+
+          <p>
+            Select Profile, Security or Preferences above.
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+  );
+}
+
+// ================= PROFILE =================
+
+function Profile() {
+  return (
+    <div className="page">
+
+      <Navbar />
+
+      <div className="settings-box">
+
+        <h1>Account Settings</h1>
+
+        <Tabs />
+
+        <div className="content">
+
+          <h2>Profile</h2>
+
+          <div className="form-group">
+
+            <label>Full Name</label>
+
+            <input
+              type="text"
+              value="Lohith"
+              readOnly
+            />
+
+          </div>
+
+          <div className="form-group">
+
+            <label>Email</label>
+
+            <input
+              type="email"
+              value="lohith@gmail.com"
+              readOnly
+            />
+
+          </div>
+
+          <button>
+            Update Profile
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+  );
+}
+
+// ================= SECURITY =================
+
+function Security() {
+  return (
+    <div className="page">
+
+      <Navbar />
+
+      <div className="settings-box">
+
+        <h1>Account Settings</h1>
+
+        <Tabs />
+
+        <div className="content">
+
+          <h2>Security</h2>
+
+          <p>
+            Change your password and security settings.
+          </p>
+
+          <button>
+            Change Password
+          </button>
+
+          <div className="security-card">
+
+            <h3>Two-Factor Authentication</h3>
+
+            <p>
+              Add an extra layer of security to your account.
+            </p>
+
+            <button>
+              Enable 2FA
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  );
+}
+
+// ================= PREFERENCES =================
+
+function Preferences() {
+  return (
+    <div className="page">
+
+      <Navbar />
+
+      <div className="settings-box">
+
+        <h1>Account Settings</h1>
+
+        <Tabs />
+
+        <div className="content">
+
+          <h2>Preferences</h2>
+
+          <div className="preference">
+
+            <div>
+
+              <h3>Email Notifications</h3>
+
+              <p>
+                Receive account updates by email.
+              </p>
+
+            </div>
+
+            <input
+              type="checkbox"
+              defaultChecked
+            />
+
+          </div>
+
+          <div className="preference">
+
+            <div>
+
+              <h3>Dark Mode</h3>
+
+              <p>
+                Use a darker interface.
+              </p>
+
+            </div>
+
+            <input
+              type="checkbox"
+            />
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  );
+}
+
+// ================= PROTECTED ROUTE =================
+
+function ProtectedRoute({ children }) {
+  const loggedIn = localStorage.getItem("loggedIn");
+
+  if (!loggedIn) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+}
+
+// ================= APP =================
+
+function App() {
+  return (
+    <BrowserRouter>
+
+      <Routes>
+
+        {/* LOGIN */}
+        <Route
+          path="/"
+          element={<Login />}
+        />
+
+        {/* SETTINGS */}
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <Settings />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* PROFILE */}
+        <Route
+          path="/settings/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* SECURITY */}
+        <Route
+          path="/settings/security"
+          element={
+            <ProtectedRoute>
+              <Security />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* PREFERENCES */}
+        <Route
+          path="/settings/preferences"
+          element={
+            <ProtectedRoute>
+              <Preferences />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* INVALID URL */}
+        <Route
+          path="*"
+          element={<Navigate to="/" replace />}
+        />
+
+      </Routes>
+
+    </BrowserRouter>
+  );
+}
+
+export default App;
